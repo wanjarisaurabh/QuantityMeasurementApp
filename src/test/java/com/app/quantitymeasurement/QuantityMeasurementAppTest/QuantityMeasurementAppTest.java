@@ -13,7 +13,7 @@ import com.app.quantitymeasurement.QuantityMeasurementApp.Length.LengthUnit;
 
 public class QuantityMeasurementAppTest {
 
-    // Same unit and same value comparison
+	 // Same unit and same value comparison
     @Test
     public void testEquality_FeetToFeet_SameValue() {
         assertEquals(new Length(1.0, LengthUnit.FEET), new Length(1.0, LengthUnit.FEET));
@@ -74,5 +74,38 @@ public class QuantityMeasurementAppTest {
     @Test
     public void testEquality_NullComparison() {
         assertNotEquals(null, new Length(1.0, LengthUnit.FEET));
+    }
+    
+    //UC4 test cases
+    @Test
+    public void testEquality_YardsToFeet_EquivalentValue() {
+        // Verifies that Quantity(1.0, YARDS) and Quantity(3.0, FEET) are equal
+        assertEquals(new Length(1.0, LengthUnit.YARDS), new Length(3.0, LengthUnit.FEET));
+    }
+
+    @Test
+    public void testEquality_YardsToInches_EquivalentValue() {
+        // Verifies that Quantity(1.0, YARDS) and Quantity(36.0, INCHES) are equal
+        assertEquals(new Length(1.0, LengthUnit.YARDS), new Length(36.0, LengthUnit.INCHES));
+    }
+
+    @Test
+    public void testEquality_YardsToYards_SameValue() {
+        // Verifies that Quantity(2.0, YARDS) and Quantity(2.0, YARDS) are equal
+        assertEquals(new Length(2.0, LengthUnit.YARDS), new Length(2.0, LengthUnit.YARDS));
+    }
+
+    @Test
+    public void testEquality_CentimetersToCentimeters_SameValue() {
+        // Verifies that Quantity(2.0, CENTIMETERS) and Quantity(2.0, CENTIMETERS) are equal
+        assertEquals(new Length(2.0, LengthUnit.CENTIMETERS), new Length(2.0, LengthUnit.CENTIMETERS));
+    }
+
+    @Test
+    public void testEquality_CentimetersToInches_EquivalentValue() {
+        // Verifies that Quantity(100.0, CENTIMETERS) and Quantity(39.3701, INCHES) are equal
+    	 assertEquals(new Length(100.0, LengthUnit.CENTIMETERS), new Length(39.3701, LengthUnit.INCHES));
+    	 
+    	 
     }
 }
