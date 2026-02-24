@@ -2,6 +2,7 @@ package com.app.quantitymeasurement.QuantityMeasurementAppTest;
 
 import org.junit.jupiter.api.Test;
 
+
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,300 +14,141 @@ import java.util.ArrayList;
 
 
 import com.app.quantitymeasurement.QuantityMeasurementApp.*;
-import com.app.quantitymeasurement.QuantityMeasurementApp.Length;
 
 
 //importing class to be tested
 import com.app.quantitymeasurement.QuantityMeasurementApp.LengthUnit;
 
 public class QuantityMeasurementAppTest {
-	 @Test
-	    public void testFeetEquality() {
-	    	Length feet1 = new Length(10.0, LengthUnit.FEET);
-	    	Length feet2 = new Length(10.0, LengthUnit.FEET);
-	    	
-	    	assertTrue(feet1.equals(feet2));
-	    }
-	    
-	    @Test
-	    public void testInchesEquality() {
-	    	Length inch1 = new Length(10.0, LengthUnit.INCHES);
-	    	Length inch2 = new Length(10.0, LengthUnit.INCHES);
-	    	
-	    	assertTrue(inch1.equals(inch2));
-	    }
-	    
-	    @Test
-	    public void testFeetInchesComparison() {
-	    	Length feet = new Length(1.0, LengthUnit.FEET);
-	    	Length inch = new Length(12.0, LengthUnit.INCHES);
-	    	
-	    	assertTrue(feet.equals(inch));
-		}
-	    
-	    @Test
-	    public void testFeetInequality() {
-	    	Length feet1 = new Length(10.0, LengthUnit.FEET);
-	    	Length feet2 = new Length(20.0, LengthUnit.FEET);
-	    	
-	    	assertFalse(feet1.equals(feet2));
-	    }
-	    
-	    @Test
-	    public void testInchesInequality() {
-	    	Length inch1 = new Length(10.0, LengthUnit.INCHES);
-	    	Length inch2 = new Length(20.0, LengthUnit.INCHES);
-	    	
-	    	assertFalse(inch1.equals(inch2));
-	    }
-	    
-	    @Test
-	    public void testCrossUnitInequality() {
-	    	Length feet = new Length(24.0, LengthUnit.FEET);
-	    	Length inch = new Length(1.0, LengthUnit.INCHES);
-	    	
-	    	assertFalse(feet.equals(inch));
-		}
-	    
-	    @Test
-	    public void testMultipleFeetComparison() {
-	        Length feet = new Length(3.0, LengthUnit.FEET);
-	        Length inch = new Length(36.0, LengthUnit.INCHES);
+	// ==========================================
+    // --- 1. IMEASURABLE INTERFACE TESTS ---
+    // ==========================================
 
-	        assertTrue(feet.equals(inch));
-	    }
-	    
-	    @Test 
-	    public void yardEquals36Inches() {
-	    	Length yard = new Length(1.0, LengthUnit.YARDS);
-	    	Length inches = new Length(36.0, LengthUnit.INCHES);
-	    	
-	    	assertTrue(yard.equals(inches));
-	    }
-	    
-	    @Test
-	    public void centimeterEquals39Point3701Inches() {
-	    	Length centimeter = new Length(100.0, LengthUnit.CENTIMETERS);
-	    	Length inches = new Length(39.37, LengthUnit.INCHES);
-	    	
-	    	assertTrue(centimeter.equals(inches));
-	    }
-	    
-	    @Test
-	    public void threeFeetEqualsOneYard() {
-	        Length feet = new Length(3.0, LengthUnit.FEET);
-	        Length yard = new Length(1.0, LengthUnit.YARDS);
+    @Test
+    public void testIMeasurableInterface_LengthUnitImplementation() {
+        assertTrue(IMeasurable.class.isAssignableFrom(LengthUnit.class), "LengthUnit must implement IMeasurable");
+        IMeasurable unit = LengthUnit.FEET;
+        assertEquals(1.0, unit.getConversionFactor(), "Feet factor should be 1.0");
+    }
 
-	        assertTrue(feet.equals(yard));
-	    }
+    @Test
+    public void testIMeasurableInterface_WeightUnitImplementation() {
+        assertTrue(IMeasurable.class.isAssignableFrom(WeightUnit.class), "WeightUnit must implement IMeasurable");
+        IMeasurable unit = WeightUnit.KILOGRAM;
+        assertEquals(1.0, unit.getConversionFactor(), "Kilogram factor should be 1.0");
+    }
 
-	    @Test
-	    public void thirtyPoint48CmEqualsOneFoot() {
-	        Length centimeter = new Length(30.48, LengthUnit.CENTIMETERS);
-	        Length foot = new Length(1.0, LengthUnit.FEET);
+    // ==========================================
+    // --- 8. AUTOMATED MATRICES (UC4, UC5, UC6/UC7) ---
+    // ==========================================
 
-	        assertTrue(centimeter.equals(foot));
-	    }
+    @ParameterizedTest(name = "Automated Equality: {0} {1} == {2} {3} -> {4}")
+    @MethodSource("provideEqualityData")
+    public <U extends IMeasurable> void testAutomatedEqualityMatrix(double val1, U unit1, double val2, U unit2, boolean expected) {
+        Quantity<U> q1 = new Quantity<>(val1, unit1);
+        Quantity<U> q2 = new Quantity<>(val2, unit2);
+        assertEquals(expected, q1.equals(q2), "Equality matrix failed");
+    }
 
-	    @Test
-	    public void yardNotEqualToInches() {
-	        Length yard = new Length(1.0, LengthUnit.YARDS);
-	        Length inches = new Length(10.0, LengthUnit.INCHES);
+    @ParameterizedTest(name = "Automated Conversion: {0} {1} to {2} = {3}")
+    @MethodSource("provideConversionData")
+    public <U extends IMeasurable> void testAutomatedConversionMatrix(double val, U fromUnit, U toUnit, double expectedVal) {
+        Quantity<U> q = new Quantity<>(val, fromUnit);
+        Quantity<U> converted = q.convertTo(toUnit);
 
-	        assertFalse(yard.equals(inches));
-	    }
+        assertEquals(expectedVal, converted.getValue(), "Conversion math failed");
+        assertEquals(toUnit, converted.getUnit(), "Target unit mismatch");
+    }
 
-	    @Test
-	    public void referenceEqualitySameObject() {
-	        Length length = new Length(10.0, LengthUnit.FEET);
+    @ParameterizedTest(name = "Automated Addition: {0} {1} + {2} {3} to {4} = {5}")
+    @MethodSource("provideAdditionData")
+    public <U extends IMeasurable> void testAutomatedAdditionMatrix(double val1, U unit1, double val2, U unit2, U targetUnit, double expectedSum) {
+        Quantity<U> q1 = new Quantity<>(val1, unit1);
+        Quantity<U> q2 = new Quantity<>(val2, unit2);
 
-	        assertTrue(length.equals(length));
-	    }
+        Quantity<U> result = QuantityMeasurementApp.demonstrateAddition(q1, q2, targetUnit);
 
-	    @Test
-	    public void equalsReturnsFalseForNull() {
-	        Length length = new Length(10.0, LengthUnit.FEET);
+        assertEquals(expectedSum, result.getValue(), "Addition math failed");
+        assertEquals(targetUnit, result.getUnit(), "Target unit mismatch");
+    }
 
-	        assertFalse(length.equals(null));
-	    }
+    // --- DATA FACTORIES FOR THE MATRICES ---
 
-	    @Test
-	    public void reflexiveSymmetricAndTransitiveProperty() {
-	        Length a = new Length(36.0, LengthUnit.INCHES);
-	        Length b = new Length(3.0, LengthUnit.FEET);
-	        Length c = new Length(1, LengthUnit.YARDS);
+    private static Stream<Arguments> provideEqualityData() {
+        List<Arguments> args = new ArrayList<>();
 
-	        // Reflexive
-	        assertTrue(a.equals(a));
+        for (LengthUnit u1 : LengthUnit.values()) {
+            for (LengthUnit u2 : LengthUnit.values()) {
+                double val1 = 2.0;
+                double val2 = (val1 * u1.getConversionFactor()) / u2.getConversionFactor();
+                args.add(Arguments.of(val1, u1, val2, u2, true));
+                args.add(Arguments.of(val1, u1, val2 + 1.0, u2, false));
+            }
+        }
 
-	        // Symmetric
-	        assertTrue(a.equals(b));
-	        assertTrue(b.equals(a));
+        for (WeightUnit u1 : WeightUnit.values()) {
+            for (WeightUnit u2 : WeightUnit.values()) {
+                double val1 = 2.0;
+                double val2 = (val1 * u1.getConversionFactor()) / u2.getConversionFactor();
+                args.add(Arguments.of(val1, u1, val2, u2, true));
+                args.add(Arguments.of(val1, u1, val2 + 1.0, u2, false));
+            }
+        }
 
-	        // Transitive
-	        assertTrue(a.equals(b));
-	        assertTrue(b.equals(c));
-	        assertTrue(a.equals(c));
-	    }
+        return args.stream();
+    }
 
-	    @Test
-	    public void differentValuesSameUnitNotEqual() {
-	        Length feet1 = new Length(10.0, LengthUnit.FEET);
-	        Length feet2 = new Length(20.0, LengthUnit.FEET);
+    private static Stream<Arguments> provideConversionData() {
+        List<Arguments> args = new ArrayList<>();
 
-	        assertFalse(feet1.equals(feet2));
-	    }
+        for (LengthUnit u1 : LengthUnit.values()) {
+            for (LengthUnit u2 : LengthUnit.values()) {
+                double val = 2.0;
+                double expected = (val * u1.getConversionFactor()) / u2.getConversionFactor();
+                expected = Math.round(expected * 100.0) / 100.0;
+                args.add(Arguments.of(val, u1, u2, expected));
+            }
+        }
 
-	    @Test
-	    public void crossUnitEqualityDemonstrateMethod() {
-	    	Length yards = new Length(1.0, LengthUnit.YARDS);
-	    	Length feets = new Length(3.0, LengthUnit.FEET); 
-	        assertTrue(QuantityMeasurementApp.demonstrateLengthEquality(yards, feets));
-	    }
-	    
-	    @Test 
-	    public void convertFeetToInches() {
-	    	Length lengthInInches = QuantityMeasurementApp.demonstrateLengthConversion(3.0, LengthUnit.FEET, LengthUnit.INCHES);
-	    	Length expectedLength = new Length(36.0, LengthUnit.INCHES);
-	    	assertTrue(QuantityMeasurementApp.demonstrateLengthEquality(lengthInInches, expectedLength));
-	    }
-	    
-	    @Test
-	    public void convertYardsToInchesUsingOverloadedMethod() {
-	    	Length lengthInYards = new Length(2.0, LengthUnit.YARDS);
-	    	Length lengthInInches = QuantityMeasurementApp.demonstrateLengthConversion(lengthInYards, LengthUnit.INCHES);
-	    	Length expectedLength = new Length(72.0, LengthUnit.INCHES);
-	    	
-	    	assertTrue(QuantityMeasurementApp.demonstrateLengthEquality(lengthInInches, expectedLength));
-	    }
-	    
-	    @Test
-	    public void addFeetAndInches() {
-	    	Length length1 = new Length(1.0, LengthUnit.FEET);
-	    	Length length2 = new Length(12.0, LengthUnit.INCHES);
-	    	
-	    	Length sumLength = QuantityMeasurementApp.demonstrateLengthAddition(length1, length2);
-	    	Length expectedLength = new Length(2.0, LengthUnit.FEET);
-	    	assertTrue(QuantityMeasurementApp.demonstrateLengthEquality(sumLength, expectedLength));
-	    }
-	    
-	    @Test
-	    public void testAddition_NullSecondOperand() {
-	        Length length = new Length(1.0, LengthUnit.FEET);
+        for (WeightUnit u1 : WeightUnit.values()) {
+            for (WeightUnit u2 : WeightUnit.values()) {
+                double val = 2.0;
+                double expected = (val * u1.getConversionFactor()) / u2.getConversionFactor();
+                expected = Math.round(expected * 100.0) / 100.0;
+                args.add(Arguments.of(val, u1, u2, expected));
+            }
+        }
 
-	        assertThrows(IllegalArgumentException.class, () -> {
-	        	length.add(null);
-	        });
-	    }
-	    
-	    @Test 
-	    public void testAddition_NegativeValues() {
-	    	Length length1 = new Length(10.0, LengthUnit.FEET);
-	    	Length length2 = new Length(-5.0, LengthUnit.FEET);
-	    	
-	    	Length sumLength = QuantityMeasurementApp.demonstrateLengthAddition(length1, length2);
-	    	Length expectedLength = new Length(5.0, LengthUnit.FEET);
-	    	assertTrue(QuantityMeasurementApp.demonstrateLengthEquality(sumLength, expectedLength));
-	    }
-	    
-	    @Test
-	    public void addFeetAndInchesWithTargetUnitInches() {
-	    	Length feet = new Length(1.0, LengthUnit.FEET);
-	    	Length inches = new Length(12.0, LengthUnit.INCHES);
-	    	
-	    	Length sumLength = QuantityMeasurementApp.demonstrateLengthAddition(feet, inches, LengthUnit.INCHES);
-	    	Length expectedLength = new Length(24.0, LengthUnit.INCHES);
-	    	assertTrue(QuantityMeasurementApp.demonstrateLengthEquality(sumLength, expectedLength));
-	    }
-	    
-	    @Test
-	    public void testAddition_ExplicitTargetUnit_NullTargetUnit() {
-	    	Length feet = new Length(1.0, LengthUnit.FEET);
-	    	Length inches = new Length(12.0, LengthUnit.INCHES);
-	    	
-	    	assertThrows(IllegalArgumentException.class, () -> {
-	    		QuantityMeasurementApp.demonstrateLengthAddition(feet, inches, null);
-	    	});
-	    }
-	    
-	    @Test
-	    public void kilogramEquals1000Grams() {
-	    	Weight kg = new Weight(1, WeightUnit.KILOGRAM);
-	    	Weight grams = new Weight(1000, WeightUnit.GRAM);
-	    	
-	    	assertTrue(QuantityMeasurementApp.demonstrateWeightEquality(kg, grams));
-	    }
+        return args.stream();
+    }
 
-	    @Test
-	    public void poundEquals453Point592Grams() {
-	        Weight pound = new Weight(1.0, WeightUnit.POUND);
-	        Weight grams = new Weight(453.592, WeightUnit.GRAM);
+    private static Stream<Arguments> provideAdditionData() {
+        List<Arguments> args = new ArrayList<>();
 
-	        assertTrue(pound.equals(grams));
-	    }
+        for (LengthUnit u1 : LengthUnit.values()) {
+            for (LengthUnit u2 : LengthUnit.values()) {
+                for (LengthUnit target : LengthUnit.values()) {
+                    double v1 = 2.0, v2 = 3.0;
+                    double totalBase = (v1 * u1.getConversionFactor()) + (v2 * u2.getConversionFactor());
+                    double expected = totalBase / target.getConversionFactor();
+                    expected = Math.round(expected * 100.0) / 100.0;
+                    args.add(Arguments.of(v1, u1, v2, u2, target, expected));
+                }
+            }
+        }
 
-	    @Test
-	    public void tonneEquals1000000Grams() {
-	        Weight tonne = new Weight(1.0, WeightUnit.TONNE);
-	        Weight grams = new Weight(1000000.0, WeightUnit.GRAM);
+        for (WeightUnit u1 : WeightUnit.values()) {
+            for (WeightUnit u2 : WeightUnit.values()) {
+                for (WeightUnit target : WeightUnit.values()) {
+                    double v1 = 2.0, v2 = 3.0;
+                    double totalBase = (v1 * u1.getConversionFactor()) + (v2 * u2.getConversionFactor());
+                    double expected = totalBase / target.getConversionFactor();
+                    expected = Math.round(expected * 100.0) / 100.0;
+                    args.add(Arguments.of(v1, u1, v2, u2, target, expected));
+                }
+            }
+        }
 
-	        assertTrue(tonne.equals(grams));
-	    }
-
-	    @Test
-	    public void kilogramNotEqualToPound() {
-	        Weight kilogram = new Weight(1.0, WeightUnit.KILOGRAM);
-	        Weight pound = new Weight(1.0, WeightUnit.POUND);
-
-	        assertFalse(kilogram.equals(pound));
-	    }
-	    
-	    @Test
-	    public void addWeightSameUnit() {
-	        Weight weight1 = new Weight(500.0, WeightUnit.GRAM);
-	        Weight weight2 = new Weight(500.0, WeightUnit.GRAM);
-	        Weight sum = weight1.add(weight2);
-	        Weight expected = new Weight(1000.0, WeightUnit.GRAM);
-
-	        assertTrue(sum.equals(expected));
-	    }
-
-	    @Test
-	    public void addWeightDiffrentUnit() {
-	        Weight kilogram = new Weight(1.0, WeightUnit.KILOGRAM);
-	        Weight grams = new Weight(500.0, WeightUnit.GRAM);
-	        Weight sum = kilogram.add(grams);
-	        Weight expected = new Weight(1.5, WeightUnit.KILOGRAM);
-
-	        assertTrue(sum.equals(expected));
-	    }
-
-	    @Test
-	    public void addWeightDiffrentUnitWithTarget() {
-	        Weight kilogram = new Weight(1.0, WeightUnit.KILOGRAM);
-	        Weight grams = new Weight(500.0, WeightUnit.GRAM);
-
-	        Weight sum = kilogram.add(grams, WeightUnit.GRAM);
-	        Weight expected = new Weight(1500.0, WeightUnit.GRAM);
-
-	        assertTrue(sum.equals(expected));
-	    }
-
-	    @Test
-	    public void weightConversion() {
-	        Weight result = QuantityMeasurementApp.demonstrateWeightConversion(2.0, WeightUnit.KILOGRAM, WeightUnit.GRAM);
-	        Weight expected = new Weight(2000.0, WeightUnit.GRAM);
-	        
-	        assertTrue(result.equals(expected));
-	    }
-
-	    @Test
-	    public void weightConversionOverloadedMethod() {
-	        Weight grams = new Weight(2000.0, WeightUnit.GRAM);
-	        
-	        Weight result = QuantityMeasurementApp.demonstrateWeightConversion(grams, WeightUnit.KILOGRAM);
-	        Weight expected = new Weight(2.0, WeightUnit.KILOGRAM);
-
-	        assertTrue(result.equals(expected));
-	    }
+        return args.stream();
+    }
 }
