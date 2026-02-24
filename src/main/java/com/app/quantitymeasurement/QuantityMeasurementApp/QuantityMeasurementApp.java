@@ -1,5 +1,5 @@
 package com.app.quantitymeasurement.QuantityMeasurementApp;
-import com.app.quantitymeasurement.QuantityMeasurementApp.Length.LengthUnit;
+import com.app.quantitymeasurement.QuantityMeasurementApp.LengthUnit;
 
 public class QuantityMeasurementApp {
 
@@ -22,7 +22,7 @@ public class QuantityMeasurementApp {
 	   return length.convertTo(toUnit);
    }
    
-   // convert the length from one uint to other, overloaded method takes Length object directly
+   // convert the length from one unit to other, overloaded method takes Length object directly
    public static Length demonstrateLengthConversion(Length length, LengthUnit toUnit) {
 	   return length.convertTo(toUnit);
    }
@@ -85,5 +85,5 @@ public class QuantityMeasurementApp {
     	
     	System.out.println(demonstrateLengthAddition(new Length(1.0, LengthUnit.FEET), new Length(12.0, LengthUnit.INCHES), LengthUnit.YARDS));
     	System.out.println();
-    }
+	}
 }
