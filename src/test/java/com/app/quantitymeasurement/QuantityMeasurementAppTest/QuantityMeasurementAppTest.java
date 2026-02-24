@@ -208,4 +208,24 @@ public class QuantityMeasurementAppTest {
 	    	Length expectedLength = new Length(5.0, LengthUnit.FEET);
 	    	assertTrue(QuantityMeasurementApp.demonstrateLengthEquality(sumLength, expectedLength));
 	    }
+	    
+	    @Test
+	    public void addFeetAndInchesWithTargetUnitInches() {
+	    	Length feet = new Length(1.0, LengthUnit.FEET);
+	    	Length inches = new Length(12.0, LengthUnit.INCHES);
+	    	
+	    	Length sumLength = QuantityMeasurementApp.demonstrateLengthAddition(feet, inches, LengthUnit.INCHES);
+	    	Length expectedLength = new Length(24.0, LengthUnit.INCHES);
+	    	assertTrue(QuantityMeasurementApp.demonstrateLengthEquality(sumLength, expectedLength));
+	    }
+	    
+	    @Test
+	    public void testAddition_ExplicitTargetUnit_NullTargetUnit() {
+	    	Length feet = new Length(1.0, LengthUnit.FEET);
+	    	Length inches = new Length(12.0, LengthUnit.INCHES);
+	    	
+	    	assertThrows(IllegalArgumentException.class, () -> {
+	    		QuantityMeasurementApp.demonstrateLengthAddition(feet, inches, null);
+	    	});
+	    }
 }
