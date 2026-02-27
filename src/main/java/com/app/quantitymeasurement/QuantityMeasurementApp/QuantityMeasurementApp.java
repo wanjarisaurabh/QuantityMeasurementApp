@@ -2,109 +2,117 @@ package com.app.quantitymeasurement.QuantityMeasurementApp;
 import com.app.quantitymeasurement.QuantityMeasurementApp.LengthUnit;
 
 public class QuantityMeasurementApp {
-
-    /**
-     * Demonstrate Equality Comparison between two generic quantities.
-     */
-    public static <U extends IMeasurable> boolean demonstrateEquality(Quantity<U> q1, Quantity<U> q2) {
-        boolean result = q1.equals(q2);
-        System.out.println("Input: " + q1.toString() + " equals " + q2.toString());
-        System.out.println("Output: " + result + "\n");
-        return result;
+    // Demonstrate Equality
+    public static <U extends IMeasurable> boolean demonstrateEquality(Quantity<U> quantity1, Quantity<U> quantity2) {
+        return quantity1.equals(quantity2);
     }
 
-    /**
-     * Demonstrate Conversion of a generic quantity to a target unit.
-     */
+    // Demonstrate Conversion of a quantity
     public static <U extends IMeasurable> Quantity<U> demonstrateConversion(Quantity<U> quantity, U targetUnit) {
-        Quantity<U> converted = quantity.convertTo(targetUnit);
-        System.out.println("Input: convert(" + quantity.toString() + " to " + targetUnit + ")");
-        System.out.println("Output: " + converted.toString() + "\n");
-        return converted;
+        double convertedValue = quantity.convertTo(targetUnit);
+        return new Quantity<>(convertedValue, targetUnit);
     }
 
-    /**
-     * Demonstrate Addition of two generic quantities (Implicit Target).
-     */
-    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(Quantity<U> q1, Quantity<U> q2) {
-        Quantity<U> sum = q1.add(q2);
-        System.out.println("Input: add(" + q1.toString() + ", " + q2.toString() + ")");
-        System.out.println("Output: " + sum.toString() + "\n");
-        return sum;
+    // Demonstrate Addition 
+    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(Quantity<U> quantity1, Quantity<U> quantity2) {
+        return quantity1.add(quantity2);
     }
 
-    /**
-     * Demonstrate Addition of two generic quantities (Explicit Target Unit).
-     */
-    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(Quantity<U> q1, Quantity<U> q2, U targetUnit) {
-        Quantity<U> sum = q1.add(q2, targetUnit);
-        System.out.println("Input: add(" + q1.toString() + ", " + q2.toString() + ", " + targetUnit + ")");
-        System.out.println("Output: " + sum.toString() + "\n");
-        return sum;
+    // Demonstrate Addition with provided return type unit
+    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(Quantity<U> quantity1, Quantity<U> quantity2, U targetUnit) {
+        return quantity1.add(quantity2, targetUnit);
+    }
+    
+    // Demonstrate Subtraction
+    public static <U extends IMeasurable> Quantity<U>
+    demonstrateSubtraction(Quantity<U> quantity1, Quantity<U> quantity2) {
+        return quantity1.subtract(quantity2);
     }
 
-     // --- NEW UC12: SUBTRACTION & DIVISION WRAPPERS ---
-
-    public static <U extends IMeasurable> Quantity<U> demonstrateSubtraction(Quantity<U> q1, Quantity<U> q2) {
-        Quantity<U> diff = q1.subtract(q2);
-        System.out.println("Input: subtract(" + q1.toString() + ", " + q2.toString() + ") -> Output: " + diff.toString());
-        return diff;
+    // Demonstrate Subtraction with target unit
+    public static <U extends IMeasurable> Quantity<U>
+    demonstrateSubtraction(Quantity<U> quantity1, Quantity<U> quantity2, U targetUnit) {
+        return quantity1.subtract(quantity2, targetUnit);
     }
 
-    public static <U extends IMeasurable> Quantity<U> demonstrateSubtraction(Quantity<U> q1, Quantity<U> q2, U targetUnit) {
-        Quantity<U> diff = q1.subtract(q2, targetUnit);
-        System.out.println("Input: subtract(" + q1.toString() + ", " + q2.toString() + ", " + targetUnit + ") -> Output: " + diff.toString());
-        return diff;
+    // Demonstrate Division
+    public static <U extends IMeasurable> double
+    demonstrateDivision(Quantity<U> quantity1, Quantity<U> quantity2) {
+        return quantity1.divide(quantity2);
     }
-
-    public static <U extends IMeasurable> double demonstrateDivision(Quantity<U> q1, Quantity<U> q2) {
-        double ratio = q1.divide(q2);
-        System.out.println("Input: divide(" + q1.toString() + ", " + q2.toString() + ") -> Output: " + ratio);
-        return ratio;
-    }
-
-    // ==========================================
-    // --- STANDALONE TESTING (MAIN METHOD) ---
-    // ==========================================
 
     public static void main(String[] args) {
-        System.out.println("--- UC12 Subtraction & Division Demonstrations ---\n");
+        // Demonstration equality 
+        Quantity<WeightUnit> weightInGrams = new Quantity<>(1000.0, WeightUnit.GRAM);
+        Quantity<WeightUnit> weightInKilograms = new Quantity<>(1.0, WeightUnit.KILOGRAM);
+        boolean areEqual = demonstrateEquality(weightInGrams, weightInKilograms);
+        System.out.println("Are weights equal? " + areEqual);
+        System.out.println();
+
+        // Demonstration conversion 
+        Quantity<WeightUnit> convertedWeight = demonstrateConversion(weightInGrams, WeightUnit.KILOGRAM);
+        System.out.println("Converted Weight: " + convertedWeight.getValue() + "" + convertedWeight.getUnit());
+        System.out.println();
+
+        // Demonstration addition 
+        Quantity<WeightUnit> weightInPounds = new Quantity<>(2.20462, WeightUnit.POUND);
+        Quantity<WeightUnit> sumWeight = demonstrateAddition(weightInKilograms, weightInPounds);
+        System.out.println("Sum Weight: " + sumWeight.getValue() + "" + sumWeight.getUnit());
+        System.out.println();
+
+        // demonstration addition with target unit
+        Quantity<WeightUnit> sumWeightInGrams = demonstrateAddition(weightInKilograms, weightInPounds, WeightUnit.GRAM);
+        System.out.println("Sum Weight in Grams: " + sumWeightInGrams.getValue() + " " + sumWeightInGrams.getUnit());
+        System.out.println();
         
-        // --- 1. LENGTH DEMONSTRATIONS ---
-        System.out.println(">> LENGTH OPERATIONS:");
+        // demonstration for volume
+        Quantity<VolumeUnit> litre = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> millilitre = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
+
+        // Equality
+        System.out.println(demonstrateEquality(litre, millilitre));
+        System.out.println();
+
+        // Conversion
+        System.out.println(demonstrateConversion(litre, VolumeUnit.GALLON));
+        System.out.println();
+
+        // Addition
+        System.out.println(demonstrateAddition(litre, millilitre));
+        System.out.println();
+        
+        // Subtraction demo
         Quantity<LengthUnit> tenFeet = new Quantity<>(10.0, LengthUnit.FEET);
         Quantity<LengthUnit> sixInches = new Quantity<>(6.0, LengthUnit.INCHES);
-        Quantity<LengthUnit> twoFeet = new Quantity<>(2.0, LengthUnit.FEET);
-        Quantity<LengthUnit> twentyFourInches = new Quantity<>(24.0, LengthUnit.INCHES);
+
+        System.out.println(demonstrateSubtraction(tenFeet, sixInches));
+        System.out.println();
+
+        // Division demo
+        Quantity<LengthUnit> twentyFeet = new Quantity<>(20.0, LengthUnit.FEET);
+        Quantity<LengthUnit> fiveFeet = new Quantity<>(5.0, LengthUnit.FEET);
+
+        System.out.println(demonstrateDivision(twentyFeet, fiveFeet));
+        System.out.println();
         
-        // Subtraction
-        demonstrateSubtraction(tenFeet, sixInches); // 10 FEET - 6 INCHES = 9.5 FEET
-        demonstrateSubtraction(tenFeet, sixInches, LengthUnit.INCHES); // 10 FEET - 6 INCHES to INCHES = 114.0 INCHES
-        
-        // Division
-        demonstrateDivision(tenFeet, twoFeet); // 10 FEET / 2 FEET = 5.0
-        demonstrateDivision(twentyFourInches, twoFeet); // 24 INCHES / 2 FEET = 1.0
-        
-        System.out.println("\n>> WEIGHT OPERATIONS:");
-        Quantity<WeightUnit> tenKg = new Quantity<>(10.0, WeightUnit.KILOGRAM);
-        Quantity<WeightUnit> fiveKg = new Quantity<>(5.0, WeightUnit.KILOGRAM);
-        Quantity<WeightUnit> fiveThousandGrams = new Quantity<>(5000.0, WeightUnit.GRAM);
-        
-        // Subtraction
-        demonstrateSubtraction(tenKg, fiveThousandGrams); // 10 KG - 5000 G = 5.0 KG
-        
-        // Division
-        demonstrateDivision(tenKg, fiveKg); // 10 KG / 5 KG = 2.0
-        
-        System.out.println("\n>> VOLUME OPERATIONS:");
-        Quantity<VolumeUnit> fiveLiters = new Quantity<>(5.0, VolumeUnit.LITER);
-        Quantity<VolumeUnit> tenLiters = new Quantity<>(10.0, VolumeUnit.LITER);
-        Quantity<VolumeUnit> fiveHundredMl = new Quantity<>(500.0, VolumeUnit.MILLILITER);
-        
-        // Subtraction
-        demonstrateSubtraction(fiveLiters, fiveHundredMl); // 5 L - 500 ML = 4.5 L
-        
-        // Division
-        demonstrateDivision(fiveLiters, tenLiters); // 5 L / 10 L = 0.5
+        // Temperature demo
+        Quantity<TemperatureUnit> temp1 = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> temp2 = new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+        System.out.println("temp1 equals temp2 ? " + demonstrateEquality(temp1, temp2));
+        System.out.println();
+
+        // Conversion
+        Quantity<TemperatureUnit> convertedTemp = demonstrateConversion(temp1, TemperatureUnit.FAHRENHEIT);
+        System.out.println("0 celcius in Fahrenheit: " + convertedTemp.getValue() + convertedTemp.getUnit());
+        System.out.println();
+
+        // Unsupported operation demo
+        try {
+        	demonstrateAddition(temp1, new Quantity<>(50.0, TemperatureUnit.CELSIUS));
+        } 
+        catch (UnsupportedOperationException e) {
+            System.out.println("Temperature add not allowed: " + e.getMessage());
+        }
     }
+
 }

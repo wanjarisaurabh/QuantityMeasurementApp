@@ -1,28 +1,36 @@
 package com.app.quantitymeasurement.QuantityMeasurementApp;
 
 public enum VolumeUnit implements IMeasurable {
-    LITER(1.0),
-    MILLILITER(0.001),       // 1000 ML in 1 Liter
-    GALLON(3.78541);         // 1 Gallon is ~3.78541 Liters
+    LITRE(1.0),
+    MILLILITRE(0.001),
+    GALLON(3.78541);
 
     private final double conversionFactor;
 
-    VolumeUnit(double conversionFactor) {
+    private VolumeUnit(double conversionFactor) {
         this.conversionFactor = conversionFactor;
     }
 
-    @Override
     public double getConversionFactor() {
-        return this.conversionFactor;
+        return conversionFactor;
     }
 
-    @Override
     public double convertToBaseUnit(double value) {
-        return value * this.conversionFactor;
+        double result = value * conversionFactor;
+        return roundOffTillTwoDecimal(result);
     }
 
-    @Override
     public double convertFromBaseUnit(double baseValue) {
-        return baseValue / this.conversionFactor;
+        double result = baseValue / conversionFactor;
+        return roundOffTillTwoDecimal(result);
     }
+
+    private double roundOffTillTwoDecimal(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
+	@Override
+	public String getUnitName() {
+		return this.name();
+	}
 }
