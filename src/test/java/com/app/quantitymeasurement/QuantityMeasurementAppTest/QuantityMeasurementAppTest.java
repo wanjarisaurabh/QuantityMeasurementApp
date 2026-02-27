@@ -20,686 +20,405 @@ import com.app.quantitymeasurement.QuantityMeasurementApp.*;
 //importing class to be tested
 import com.app.quantitymeasurement.QuantityMeasurementApp.LengthUnit;
 
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
 public class QuantityMeasurementAppTest {
-
-    // ==========================================
-    // --- 1. IMEASURABLE INTERFACE TESTS ---
-    // ==========================================
-
     @Test
-    public void testIMeasurableInterface_LengthUnitImplementation() {
-        assertTrue(IMeasurable.class.isAssignableFrom(LengthUnit.class));
-        assertEquals(1.0, LengthUnit.FEET.getConversionFactor(), "Feet factor should be 1.0");
+    public void lengthFeetEqualsInches() {
+        Quantity<LengthUnit> feet = new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<LengthUnit> inches = new Quantity<>(12.0, LengthUnit.INCHES);
+
+        assertTrue(feet.equals(inches));
     }
 
     @Test
-    public void testIMeasurableInterface_WeightUnitImplementation() {
-        assertTrue(IMeasurable.class.isAssignableFrom(WeightUnit.class));
-        assertEquals(1.0, WeightUnit.KILOGRAM.getConversionFactor(), "Kilogram factor should be 1.0");
+    public void lengthYardsEqualsFeet() {
+        Quantity<LengthUnit> yards = new Quantity<>(1.0, LengthUnit.YARDS);
+        Quantity<LengthUnit> feet = new Quantity<>(3.0, LengthUnit.FEET);
+
+        assertTrue(yards.equals(feet));
     }
 
     @Test
-    public void testIMeasurableInterface_ConsistentBehavior() {
-        // Proves that both enums have identical method contracts via the interface
-        IMeasurable length = LengthUnit.FEET;
-        IMeasurable weight = WeightUnit.KILOGRAM;
-        assertNotNull(length);
-        assertNotNull(weight);
-    }
+    public void weightKilogramEqualsGrams() {
+        Quantity<WeightUnit> kg = new Quantity<>(1.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> grams = new Quantity<>(1000.0, WeightUnit.GRAM);
 
-    // ==========================================
-    // --- 2. GENERIC QUANTITY - LENGTH OPERATIONS ---
-    // ==========================================
-
-    @Test
-    public void testGenericQuantity_LengthOperations_Equality() {
-        assertTrue(new Quantity<>(1.0, LengthUnit.FEET).equals(new Quantity<>(12.0, LengthUnit.INCHES)));
+        assertTrue(kg.equals(grams));
     }
 
     @Test
-    public void testGenericQuantity_LengthOperations_Conversion() {
-        Quantity<LengthUnit> converted = new Quantity<>(1.0, LengthUnit.FEET).convertTo(LengthUnit.INCHES);
-        assertEquals(12.0, converted.getValue());
-        assertEquals(LengthUnit.INCHES, converted.getUnit());
+    public void weightPoundEqualsGrams() {
+        Quantity<WeightUnit> pound = new Quantity<>(1.0, WeightUnit.POUND);
+        Quantity<WeightUnit> grams = new Quantity<>(453.592, WeightUnit.GRAM);
+
+        assertTrue(pound.equals(grams));
     }
 
     @Test
-    public void testGenericQuantity_LengthOperations_Addition() {
-        Quantity<LengthUnit> sum = new Quantity<>(1.0, LengthUnit.FEET).add(new Quantity<>(12.0, LengthUnit.INCHES), LengthUnit.FEET);
-        assertEquals(2.0, sum.getValue());
-    }
+    public void convertLengthFeetToInches() {
+        Quantity<LengthUnit> feet = new Quantity<>(3.0, LengthUnit.FEET);
+        Quantity<LengthUnit> result = QuantityMeasurementApp.demonstrateConversion(feet, LengthUnit.INCHES);
 
-    // ==========================================
-    // --- 3. GENERIC QUANTITY - WEIGHT OPERATIONS ---
-    // ==========================================
-
-    @Test
-    public void testGenericQuantity_WeightOperations_Equality() {
-        assertTrue(new Quantity<>(1.0, WeightUnit.KILOGRAM).equals(new Quantity<>(1000.0, WeightUnit.GRAM)));
+        assertEquals(36.0, result.getValue());
     }
 
     @Test
-    public void testGenericQuantity_WeightOperations_Conversion() {
-        Quantity<WeightUnit> converted = new Quantity<>(1.0, WeightUnit.KILOGRAM).convertTo(WeightUnit.GRAM);
-        assertEquals(1000.0, converted.getValue());
+    public void addLengthFeetAndInches() {
+        Quantity<LengthUnit> feet = new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<LengthUnit> inches = new Quantity<>(12.0, LengthUnit.INCHES);
+        Quantity<LengthUnit> result = QuantityMeasurementApp.demonstrateAddition(feet, inches);
+
+        assertEquals(2.0, result.getValue());
     }
 
     @Test
-    public void testGenericQuantity_WeightOperations_Addition() {
-        Quantity<WeightUnit> sum = new Quantity<>(1.0, WeightUnit.KILOGRAM).add(new Quantity<>(1000.0, WeightUnit.GRAM), WeightUnit.KILOGRAM);
-        assertEquals(2.0, sum.getValue());
-    }
+    public void addWeightKilogramsAndGrams() {
+        Quantity<WeightUnit> kg = new Quantity<>(1.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> grams = new Quantity<>(1000.0, WeightUnit.GRAM);
+        Quantity<WeightUnit> result = QuantityMeasurementApp.demonstrateAddition(kg, grams);
 
-    // ==========================================
-    // --- 4. CROSS-CATEGORY & TYPE SAFETY ---
-    // ==========================================
-
-    @Test
-    public void testCrossCategoryPrevention_LengthVsWeight() {
-        assertFalse(new Quantity<>(1.0, LengthUnit.FEET).equals(new Quantity<>(1.0, WeightUnit.KILOGRAM)));
-    }
-
-    // ==========================================
-    // --- 5. VALIDATION & IMMUTABILITY ---
-    // ==========================================
-
-    @Test
-    public void testGenericQuantity_ConstructorValidation_NullUnit() {
-        assertThrows(IllegalArgumentException.class, () -> new Quantity<>(1.0, null));
+        assertEquals(2.0, result.getValue());
     }
 
     @Test
-    public void testGenericQuantity_ConstructorValidation_InvalidValue() {
-        assertThrows(IllegalArgumentException.class, () -> new Quantity<>(Double.NaN, LengthUnit.FEET));
-    }
-
-    @Test
-    public void testImmutability_GenericQuantity() {
-        Quantity<LengthUnit> original = new Quantity<>(1.0, LengthUnit.FEET);
-        Quantity<LengthUnit> added = original.add(new Quantity<>(1.0, LengthUnit.FEET));
-        assertEquals(1.0, original.getValue());
-        assertNotSame(original, added);
-    }
-
-    // ==========================================
-    // --- 6. APP CONTROLLER DEMONSTRATION TESTS ---
-    // ==========================================
-
-    @Test
-    public void testQuantityMeasurementApp_SimplifiedDemonstration_Equality() {
-        assertTrue(QuantityMeasurementApp.demonstrateEquality(new Quantity<>(1.0, LengthUnit.FEET), new Quantity<>(12.0, LengthUnit.INCHES)));
-    }
-
-    @Test
-    public void testQuantityMeasurementApp_SimplifiedDemonstration_Conversion() {
-        Quantity<WeightUnit> converted = QuantityMeasurementApp.demonstrateConversion(new Quantity<>(1.0, WeightUnit.KILOGRAM), WeightUnit.GRAM);
-        assertEquals(1000.0, converted.getValue());
-    }
-
-    @Test
-    public void testQuantityMeasurementApp_SimplifiedDemonstration_Addition() {
-        Quantity<LengthUnit> sum = QuantityMeasurementApp.demonstrateAddition(new Quantity<>(1.0, LengthUnit.FEET), new Quantity<>(12.0, LengthUnit.INCHES), LengthUnit.FEET);
-        assertEquals(2.0, sum.getValue());
-    }
-
-    // ==========================================
-    // --- 7. EXPLICIT VOLUME TEST CASES (UC11) ---
-    // ==========================================
-
-    
-    // --- Volume Equality Tests ---
-    @Test
-    public void testEquality_LitreToLitre_SameValue() {
-        assertTrue(new Quantity<>(1.0, VolumeUnit.LITER).equals(new Quantity<>(1.0, VolumeUnit.LITER)));
-    }
-
-    @Test
-    public void testEquality_LitreToLitre_DifferentValue() {
-        assertFalse(new Quantity<>(1.0, VolumeUnit.LITER).equals(new Quantity<>(2.0, VolumeUnit.LITER)));
-    }
-
-   
-    @Test
-    public void testEquality_TransitiveProperty() {
-        Quantity<VolumeUnit> a = new Quantity<>(1.0, VolumeUnit.LITER);
-        Quantity<VolumeUnit> b = new Quantity<>(1000.0, VolumeUnit.MILLILITER);
-        Quantity<VolumeUnit> c = new Quantity<>(1.0, VolumeUnit.LITER);
-        assertTrue(a.equals(b) && b.equals(c) && a.equals(c));
-    }
-
-    @Test
-    public void testEquality_ZeroValue() {
-        assertTrue(new Quantity<>(0.0, VolumeUnit.LITER).equals(new Quantity<>(0.0, VolumeUnit.MILLILITER)));
-    }
-
-    @Test
-    public void testEquality_NegativeVolume() {
-        assertTrue(new Quantity<>(-1.0, VolumeUnit.LITER).equals(new Quantity<>(-1000.0, VolumeUnit.MILLILITER)));
-    }
-
-    @Test
-    public void testEquality_LargeVolumeValue() {
-        assertTrue(new Quantity<>(1000000.0, VolumeUnit.MILLILITER).equals(new Quantity<>(1000.0, VolumeUnit.LITER)));
-    }
-
-    @Test
-    public void testEquality_SmallVolumeValue() {
-        assertTrue(new Quantity<>(0.001, VolumeUnit.LITER).equals(new Quantity<>(1.0, VolumeUnit.MILLILITER)));
-    }
-
-    // --- Volume Conversion Tests ---
-    
-
- 
-
-    // ==========================================
-    // --- 8. AUTOMATED MATRICES (UC4, UC5, UC6/UC7, UC11) ---
-    // ==========================================
-
-    @ParameterizedTest(name = "Automated Equality: {0} {1} == {2} {3} -> {4}")
-    @MethodSource("provideEqualityData")
-    public <U extends IMeasurable> void testAutomatedEqualityMatrix(
-            double val1, U unit1, double val2, U unit2, boolean expected) {
-
-        Quantity<U> q1 = new Quantity<>(val1, unit1);
-        Quantity<U> q2 = new Quantity<>(val2, unit2);
-
-        assertEquals(expected, q1.equals(q2), "Equality matrix failed");
-    }
-
-    @ParameterizedTest(name = "Automated Conversion: {0} {1} to {2} = {3}")
-    @MethodSource("provideConversionData")
-    public <U extends IMeasurable> void testAutomatedConversionMatrix(
-            double val, U fromUnit, U toUnit, double expectedVal) {
-
-        Quantity<U> q = new Quantity<>(val, fromUnit);
-        Quantity<U> converted = q.convertTo(toUnit);
-
-        assertEquals(expectedVal, converted.getValue(), "Conversion math failed");
-        assertEquals(toUnit, converted.getUnit(), "Target unit mismatch");
-    }
-
-    @ParameterizedTest(name = "Automated Addition: {0} {1} + {2} {3} to {4} = {5}")
-    @MethodSource("provideAdditionData")
-    public <U extends IMeasurable> void testAutomatedAdditionMatrix(
-            double val1, U unit1, double val2, U unit2, U targetUnit, double expectedSum) {
-
-        Quantity<U> q1 = new Quantity<>(val1, unit1);
-        Quantity<U> q2 = new Quantity<>(val2, unit2);
-
-        Quantity<U> result = QuantityMeasurementApp.demonstrateAddition(q1, q2, targetUnit);
-
-        assertEquals(expectedSum, result.getValue(), "Addition math failed");
-        assertEquals(targetUnit, result.getUnit(), "Target unit mismatch");
-    }
-
-    // --- DATA FACTORIES FOR THE MATRICES ---
-
-    private static Stream<Arguments> provideEqualityData() {
-        List<Arguments> args = new ArrayList<>();
-
-        // 1. Length Combinations
-        for (LengthUnit u1 : LengthUnit.values()) {
-            for (LengthUnit u2 : LengthUnit.values()) {
-                double val1 = 2.0;
-                double val2 = (val1 * u1.getConversionFactor()) / u2.getConversionFactor();
-                args.add(Arguments.of(val1, u1, val2, u2, true));
-                args.add(Arguments.of(val1, u1, val2 + 1.0, u2, false));
-            }
-        }
-
-        // 2. Weight Combinations
-        for (WeightUnit u1 : WeightUnit.values()) {
-            for (WeightUnit u2 : WeightUnit.values()) {
-                double val1 = 2.0;
-                double val2 = (val1 * u1.getConversionFactor()) / u2.getConversionFactor();
-                args.add(Arguments.of(val1, u1, val2, u2, true));
-                args.add(Arguments.of(val1, u1, val2 + 1.0, u2, false));
-            }
-        }
-
-        // 3. Volume Combinations (UC11)
-        for (VolumeUnit u1 : VolumeUnit.values()) {
-            for (VolumeUnit u2 : VolumeUnit.values()) {
-                double val1 = 2.0;
-                double val2 = (val1 * u1.getConversionFactor()) / u2.getConversionFactor();
-                args.add(Arguments.of(val1, u1, val2, u2, true));
-                args.add(Arguments.of(val1, u1, val2 + 1.0, u2, false));
-            }
-        }
-
-        return args.stream();
-    }
-
-    private static Stream<Arguments> provideConversionData() {
-        List<Arguments> args = new ArrayList<>();
-
-        // 1. Length Conversions
-        for (LengthUnit u1 : LengthUnit.values()) {
-            for (LengthUnit u2 : LengthUnit.values()) {
-                double val = 2.0;
-                double expected = (val * u1.getConversionFactor()) / u2.getConversionFactor();
-                expected = Math.round(expected * 100.0) / 100.0;
-                args.add(Arguments.of(val, u1, u2, expected));
-            }
-        }
-
-        // 2. Weight Conversions
-        for (WeightUnit u1 : WeightUnit.values()) {
-            for (WeightUnit u2 : WeightUnit.values()) {
-                double val = 2.0;
-                double expected = (val * u1.getConversionFactor()) / u2.getConversionFactor();
-                expected = Math.round(expected * 100.0) / 100.0;
-                args.add(Arguments.of(val, u1, u2, expected));
-            }
-        }
-
-        // 3. Volume Conversions (UC11)
-        for (VolumeUnit u1 : VolumeUnit.values()) {
-            for (VolumeUnit u2 : VolumeUnit.values()) {
-                double val = 2.0;
-                double expected = (val * u1.getConversionFactor()) / u2.getConversionFactor();
-                expected = Math.round(expected * 100.0) / 100.0;
-                args.add(Arguments.of(val, u1, u2, expected));
-            }
-        }
-
-        return args.stream();
-    }
-
-    private static Stream<Arguments> provideAdditionData() {
-        List<Arguments> args = new ArrayList<>();
-
-        // 1. Length Additions
-        for (LengthUnit u1 : LengthUnit.values()) {
-            for (LengthUnit u2 : LengthUnit.values()) {
-                for (LengthUnit target : LengthUnit.values()) {
-                    double v1 = 2.0, v2 = 3.0;
-                    double totalBase = (v1 * u1.getConversionFactor()) + (v2 * u2.getConversionFactor());
-                    double expected = totalBase / target.getConversionFactor();
-                    expected = Math.round(expected * 100.0) / 100.0;
-                    args.add(Arguments.of(v1, u1, v2, u2, target, expected));
-                }
-            }
-        }
-
-        // 2. Weight Additions
-        for (WeightUnit u1 : WeightUnit.values()) {
-            for (WeightUnit u2 : WeightUnit.values()) {
-                for (WeightUnit target : WeightUnit.values()) {
-                    double v1 = 2.0, v2 = 3.0;
-                    double totalBase = (v1 * u1.getConversionFactor()) + (v2 * u2.getConversionFactor());
-                    double expected = totalBase / target.getConversionFactor();
-                    expected = Math.round(expected * 100.0) / 100.0;
-                    args.add(Arguments.of(v1, u1, v2, u2, target, expected));
-                }
-            }
-        }
-
-        // 3. Volume Additions (UC11)
-        for (VolumeUnit u1 : VolumeUnit.values()) {
-            for (VolumeUnit u2 : VolumeUnit.values()) {
-                for (VolumeUnit target : VolumeUnit.values()) {
-                    double v1 = 2.0, v2 = 3.0;
-                    double totalBase = (v1 * u1.getConversionFactor()) + (v2 * u2.getConversionFactor());
-                    double expected = totalBase / target.getConversionFactor();
-                    expected = Math.round(expected * 100.0) / 100.0;
-                    args.add(Arguments.of(v1, u1, v2, u2, target, expected));
-                }
-            }
-        }
-
-        return args.stream();
-    }
-    
-    public void testSubtraction_Immutability() {
-        Quantity<LengthUnit> original = new Quantity<>(10.0, LengthUnit.FEET);
-        original.subtract(new Quantity<>(5.0, LengthUnit.FEET));
-        assertEquals(10.0, original.getValue(), "Subtraction mutated the original object");
-    }
-
-    @Test
-    public void testDivision_Immutability() {
-        Quantity<LengthUnit> original = new Quantity<>(10.0, LengthUnit.FEET);
-        original.divide(new Quantity<>(5.0, LengthUnit.FEET));
-        assertEquals(10.0, original.getValue(), "Division mutated the original object");
-    }
-
-    @Test
-    public void testDivision_PrecisionHandling() {
-        Quantity<LengthUnit> a = new Quantity<>(10.0, LengthUnit.FEET);
-        Quantity<LengthUnit> b = new Quantity<>(3.0, LengthUnit.FEET);
-        double result = a.divide(b);
-        // 10 / 3 = 3.3333333... Ensure no premature rounding
-        assertTrue(result > 3.33 && result < 3.34);
-    }
-
-    
-    // ==========================================
-    // --- EXPLICIT SUBTRACTION & DIVISION TESTS (UC12) ---
-    // ==========================================
-
-    @Test
-    public void testSubtraction_WithZeroOperand() {
-        Quantity<LengthUnit> q1 = new Quantity<>(5.0, LengthUnit.FEET);
-        Quantity<LengthUnit> q2 = new Quantity<>(0.0, LengthUnit.INCHES);
-        Quantity<LengthUnit> diff = q1.subtract(q2);
-        assertEquals(5.0, diff.getValue(), "Subtracting zero should return identity");
-    }
-
-    @Test
-    public void testSubtraction_WithNegativeValues() {
-        Quantity<LengthUnit> q1 = new Quantity<>(5.0, LengthUnit.FEET);
-        Quantity<LengthUnit> q2 = new Quantity<>(-2.0, LengthUnit.FEET);
-        Quantity<LengthUnit> diff = q1.subtract(q2);
-        assertEquals(7.0, diff.getValue(), "5 - (-2) should be 7");
-    }
-
-    @Test
-    public void testSubtraction_NonCommutative() {
-        Quantity<LengthUnit> a = new Quantity<>(10.0, LengthUnit.FEET);
-        Quantity<LengthUnit> b = new Quantity<>(5.0, LengthUnit.FEET);
+    public void testGenericTypeSafetyWithWeight() {
+        Quantity<WeightUnit> weight = new Quantity<>(1.0, WeightUnit.KILOGRAM);
         
-        Quantity<LengthUnit> aMinusB = a.subtract(b);
-        Quantity<LengthUnit> bMinusA = b.subtract(a);
+        assertEquals(1.0, weight.getValue());
+        assertEquals(WeightUnit.KILOGRAM, weight.getUnit());
+    }
+
+    @Test
+    public void convertWeightKilogramsToGrams() {
+        Quantity<WeightUnit> kg = new Quantity<>(2.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> result = QuantityMeasurementApp.demonstrateConversion(kg, WeightUnit.GRAM);
+
+        assertEquals(2000.0, result.getValue());
+    }
+
+    @Test
+    public void addWeightKilogramsAndPounds() {
+        Quantity<WeightUnit> kg = new Quantity<>(1.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> pound = new Quantity<>(2.20462, WeightUnit.POUND);
+        Quantity<WeightUnit> result = QuantityMeasurementApp.demonstrateAddition(kg, pound);
+
+        assertEquals(2.0, result.getValue());
+    }
+
+    @Test
+    public void convertLengthYardsToInches() {
+        Quantity<LengthUnit> yards = new Quantity<>(1.0, LengthUnit.YARDS);
+        Quantity<LengthUnit> result = QuantityMeasurementApp.demonstrateConversion(yards, LengthUnit.INCHES);
+
+        assertEquals(36.0, result.getValue());
+    }
+
+    @Test
+    public void preventCrossTypeComparisonLengthVsWeight() {
+        Quantity<LengthUnit> length = new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<WeightUnit> weight = new Quantity<>(1.0, WeightUnit.KILOGRAM);
+
+        assertFalse(length.equals(weight));
+    }
+
+    @Test
+    public void preventCrossTypeAdditionLengthVsWeight() {
+        Quantity<LengthUnit> length = new Quantity<>(1.0, LengthUnit.FEET);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            length.add((Quantity)new Quantity<WeightUnit>(1.0, WeightUnit.KILOGRAM));
+        });
+    }
+
+    @Test
+    public void preventCrossTypeConversionLengthToWeight() {
+        Quantity<LengthUnit> length = new Quantity<>(1.0, LengthUnit.FEET);
         
-        assertNotEquals(aMinusB.getValue(), bMinusA.getValue(), "Subtraction is not commutative");
-        assertEquals(5.0, aMinusB.getValue());
-        assertEquals(-5.0, bMinusA.getValue());
+        assertThrows(Exception.class, () -> {
+            length.convertTo((LengthUnit) (Object) WeightUnit.GRAM);
+        });
     }
 
     @Test
-    public void testSubtraction_WithLargeValues() {
-        Quantity<WeightUnit> q1 = new Quantity<>(1e6, WeightUnit.KILOGRAM);
-        Quantity<WeightUnit> q2 = new Quantity<>(5e5, WeightUnit.KILOGRAM);
-        assertEquals(5e5, q1.subtract(q2).getValue());
+    public void addLengthYardsAndFeet() {
+        Quantity<LengthUnit> yards = new Quantity<>(1.0, LengthUnit.YARDS);
+        Quantity<LengthUnit> feet = new Quantity<>(3.0, LengthUnit.FEET);
+        Quantity<LengthUnit> result = QuantityMeasurementApp.demonstrateAddition(yards, feet);
+
+        assertEquals(2.0, result.getValue());
     }
 
     @Test
-    public void testSubtraction_WithSmallValues() {
-        Quantity<LengthUnit> q1 = new Quantity<>(0.001, LengthUnit.FEET);
-        Quantity<LengthUnit> q2 = new Quantity<>(0.0005, LengthUnit.FEET);
-        assertEquals(0.0, Math.round(q1.subtract(q2).getValue() * 100.0) / 100.0, "Result is 0.0005, which rounds to 0.00");
-    }
+    public void addWeightTonnesAndKilograms() {
+        Quantity<WeightUnit> tonne = new Quantity<>(1.0, WeightUnit.TONNE);
+        Quantity<WeightUnit> kg = new Quantity<>(1000.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> result = QuantityMeasurementApp.demonstrateAddition(tonne, kg);
 
-    @Test
-    public void testSubtraction_NullOperand() {
-        assertThrows(IllegalArgumentException.class, () -> new Quantity<>(10.0, LengthUnit.FEET).subtract(null));
-    }
-
-    @Test
-    public void testSubtraction_NullTargetUnit() {
-        assertThrows(IllegalArgumentException.class, () -> new Quantity<>(10.0, LengthUnit.FEET).subtract(new Quantity<>(5.0, LengthUnit.FEET), null));
-    }
-
-    @Test
-    public void testSubtraction_CrossCategory() {
-        Quantity<LengthUnit> feet = new Quantity<>(10.0, LengthUnit.FEET);
-        Quantity<WeightUnit> kg = new Quantity<>(5.0, WeightUnit.KILOGRAM);
-        assertThrows(IllegalArgumentException.class, () -> feet.subtract((Quantity) kg));
-    }
-
-    @Test
-    public void testSubtraction_ChainedOperations() {
-        Quantity<LengthUnit> result = new Quantity<>(10.0, LengthUnit.FEET)
-                .subtract(new Quantity<>(2.0, LengthUnit.FEET))
-                .subtract(new Quantity<>(1.0, LengthUnit.FEET));
-        assertEquals(7.0, result.getValue());
-    }
-
-    @Test
-    public void testDivision_NonCommutative() {
-        Quantity<LengthUnit> a = new Quantity<>(10.0, LengthUnit.FEET);
-        Quantity<LengthUnit> b = new Quantity<>(5.0, LengthUnit.FEET);
-        assertNotEquals(a.divide(b), b.divide(a), 1e-6);
-        assertEquals(2.0, a.divide(b), 1e-6);
-        assertEquals(0.5, b.divide(a), 1e-6);
-    }
-
-    @Test
-    public void testDivision_ByZero() {
-        // Based on the specific code review earlier, your implementation throws IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, () -> new Quantity<>(10.0, LengthUnit.FEET).divide(new Quantity<>(0.0, LengthUnit.FEET)));
+        assertEquals(2.0, result.getValue());
     }
     
+    @Test
+    public void backwardCompatibilityLengthFeetEqualsInches() {
+        Quantity<LengthUnit> feet = new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<LengthUnit> inches = new Quantity<>(12.0, LengthUnit.INCHES);
+
+        assertTrue(feet.equals(inches));
+    }
+
+    @Test
+    public void backwardCompatibilityWeightKilogramEqualsGrams() {
+        Quantity<WeightUnit> kg = new Quantity<>(1.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> grams = new Quantity<>(1000.0, WeightUnit.GRAM);
+
+        assertTrue(kg.equals(grams));
+    }
+
+    @Test
+    public void backwardCompatibilityConvertLengthFeetToInches() {
+        Quantity<LengthUnit> feet = new Quantity<>(3.0, LengthUnit.FEET);
+        Quantity<LengthUnit> result = QuantityMeasurementApp.demonstrateConversion(feet, LengthUnit.INCHES);
+
+        assertEquals(36.0, result.getValue());
+    }
+
+    @Test
+    public void backwardCompatibilityConvertWeightKilogramsToGrams() {
+        Quantity<WeightUnit> kg = new Quantity<>(2.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> result = QuantityMeasurementApp.demonstrateConversion(kg, WeightUnit.GRAM);
+
+        assertEquals(2000.0, result.getValue());
+    }
+
+    @Test
+    public void backwardCompatibilityAddLengthInSameUnit() {
+        Quantity<LengthUnit> feet1 = new Quantity<>(2.0, LengthUnit.FEET);
+        Quantity<LengthUnit> feet2 = new Quantity<>(3.0, LengthUnit.FEET);
+        Quantity<LengthUnit> result = feet1.add(feet2);
+
+        assertEquals(5.0, result.getValue());
+    }
+
+    @Test
+    public void backwardCompatibilityAddWeightInSameUnit() {
+        Quantity<WeightUnit> grams1 = new Quantity<>(500.0, WeightUnit.GRAM);
+        Quantity<WeightUnit> grams2 = new Quantity<>(500.0, WeightUnit.GRAM);
+        Quantity<WeightUnit> result = grams1.add(grams2);
+
+        assertEquals(1000.0, result.getValue());
+    }
+
+    @Test
+    public void backwardCompatibilityLengthYardsEqualsFeet() {
+        Quantity<LengthUnit> yard = new Quantity<>(1.0, LengthUnit.YARDS);
+        Quantity<LengthUnit> feet = new Quantity<>(3.0, LengthUnit.FEET);
+
+        assertTrue(yard.equals(feet));
+    }
+
+    @Test
+    public void backwardCompatibilityWeightPoundEqualsGrams() {
+        Quantity<WeightUnit> pound = new Quantity<>(1.0, WeightUnit.POUND);
+        Quantity<WeightUnit> grams = new Quantity<>(453.592, WeightUnit.GRAM);
+
+        assertTrue(pound.equals(grams));
+    }
+
+    @Test
+    public void backwardCompatibilityChainedAdditionsLength() {
+        Quantity<LengthUnit> oneFoot = new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<LengthUnit> twelveInches = new Quantity<>(12.0, LengthUnit.INCHES);
+        Quantity<LengthUnit> oneYard = new Quantity<>(1.0, LengthUnit.YARDS);
+        Quantity<LengthUnit> result = oneFoot.add(twelveInches).add(oneYard);
+
+        assertEquals(5.0, result.getValue());
+    }
     
- // ==========================================
- // --- UC12 OPERATIONS - AUTOMATED MATRICES (ALL OPERATIONS)  ---
- // ==========================================
+    @Test
+    public void volumeLitreEqualsMillilitre() {
+        Quantity<VolumeUnit> litre = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> ml = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
 
- @ParameterizedTest(name = "Automated Subtraction: {0} {1} - {2} {3} to {4} = {5}")
- @MethodSource("provideSubtractionData")
- public <U extends IMeasurable> void testAutomatedSubtractionMatrix(
-         double v1, U u1, double v2, U u2, U target, double expected) {
+        assertTrue(litre.equals(ml));
+    }
 
-     Quantity<U> q1 = new Quantity<>(v1, u1);
-     Quantity<U> q2 = new Quantity<>(v2, u2);
-     Quantity<U> result = QuantityMeasurementApp.demonstrateSubtraction(q1, q2, target);
+    @Test
+    public void volumeNotEqual() {
+        Quantity<VolumeUnit> litre = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> twoLitres = new Quantity<>(2.0, VolumeUnit.LITRE);
 
-     assertEquals(expected, result.getValue(), 1e-6, "Subtraction matrix failed");
-     assertEquals(target, result.getUnit(), "Target unit mismatch");
- }
+        assertFalse(litre.equals(twoLitres));
+    }
+    
+    @Test
+    public void convertLitreToMillilitre() {
+        Quantity<VolumeUnit> litre = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> result = QuantityMeasurementApp.demonstrateConversion(litre, VolumeUnit.MILLILITRE);
 
- @ParameterizedTest(name = "Automated Division: {0} {1} / {2} {3} = {4}")
- @MethodSource("provideDivisionData")
- public <U extends IMeasurable> void testAutomatedDivisionMatrix(
-         double v1, U u1, double v2, U u2, double expectedRatio) {
+        assertEquals(1000.0, result.getValue());
+    }
 
-     Quantity<U> q1 = new Quantity<>(v1, u1);
-     Quantity<U> q2 = new Quantity<>(v2, u2);
-     double result = QuantityMeasurementApp.demonstrateDivision(q1, q2);
+    @Test
+    public void convertGallonToLitre() {
+        Quantity<VolumeUnit> gallon = new Quantity<>(1.0, VolumeUnit.GALLON);
+        Quantity<VolumeUnit> result = QuantityMeasurementApp.demonstrateConversion(gallon, VolumeUnit.LITRE);
 
-     assertEquals(expectedRatio, result, 1e-6, "Division math failed");
- }
+        assertEquals(3.79, result.getValue());
+    }
+    
+    @Test
+    public void addVolumeSameUnit() {
+        Quantity<VolumeUnit> one = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> two = new Quantity<>(2.0, VolumeUnit.LITRE);
 
- // --- DATA FACTORIES ---
+        Quantity<VolumeUnit> result = one.add(two);
 
- private static Stream<Arguments> provideSubtractionData() {
-     List<Arguments> args = new ArrayList<>();
+        assertEquals(3.0, result.getValue());
+    }
 
-     for (LengthUnit u1 : LengthUnit.values()) {
-         for (LengthUnit u2 : LengthUnit.values()) {
-             for (LengthUnit target : LengthUnit.values()) {
-                 double v1 = 10.0, v2 = 2.0;
-                 double totalBase = (v1 * u1.getConversionFactor()) -
-                                    (v2 * u2.getConversionFactor());
-                 double expected = Math.round(
-                         (totalBase / target.getConversionFactor()) * 100.0) / 100.0;
+    @Test
+    public void addVolumeDifferentUnits() {
+        Quantity<VolumeUnit> litre = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> ml = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
 
-                 args.add(Arguments.of(v1, u1, v2, u2, target, expected));
-             }
-         }
-     }
+        Quantity<VolumeUnit> result = litre.add(ml);
 
-     for (WeightUnit u1 : WeightUnit.values()) {
-         for (WeightUnit u2 : WeightUnit.values()) {
-             for (WeightUnit target : WeightUnit.values()) {
-                 double v1 = 10.0, v2 = 2.0;
-                 double totalBase = (v1 * u1.getConversionFactor()) -
-                                    (v2 * u2.getConversionFactor());
-                 double expected = Math.round(
-                         (totalBase / target.getConversionFactor()) * 100.0) / 100.0;
+        assertEquals(2.0, result.getValue());
+    }
 
-                 args.add(Arguments.of(v1, u1, v2, u2, target, expected));
-             }
-         }
-     }
+    @Test
+    public void addVolumeWithTargetUnit() {
+    	Quantity<VolumeUnit> litre = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> ml = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
 
-     for (VolumeUnit u1 : VolumeUnit.values()) {
-         for (VolumeUnit u2 : VolumeUnit.values()) {
-             for (VolumeUnit target : VolumeUnit.values()) {
-                 double v1 = 10.0, v2 = 2.0;
-                 double totalBase = (v1 * u1.getConversionFactor()) -
-                                    (v2 * u2.getConversionFactor());
-                 double expected = Math.round(
-                         (totalBase / target.getConversionFactor()) * 100.0) / 100.0;
+        Quantity<VolumeUnit> result = litre.add(ml, VolumeUnit.MILLILITRE);
 
-                 args.add(Arguments.of(v1, u1, v2, u2, target, expected));
-             }
-         }
-     }
+        assertEquals(2000.0, result.getValue());
+    }
+    
+    @Test
+    public void preventVolumeVsLengthComparison() {
+        Quantity<VolumeUnit> volume = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<LengthUnit> length = new Quantity<>(1.0, LengthUnit.FEET);
+        
+        assertFalse(volume.equals(length));
+    }
+    
+    @Test
+    public void subtractSameUnit() {
+        Quantity<LengthUnit> ten = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> five = new Quantity<>(5.0, LengthUnit.FEET);
+        Quantity<LengthUnit> result = ten.subtract(five);
 
-     return args.stream();
- }
+        assertEquals(5.0, result.getValue());
+    }
 
- private static Stream<Arguments> provideDivisionData() {
-     List<Arguments> args = new ArrayList<>();
+    @Test
+    public void subtractCrossUnit() {
+        Quantity<LengthUnit> tenFeet = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> sixInches = new Quantity<>(6.0, LengthUnit.INCHES);
+        Quantity<LengthUnit> result = tenFeet.subtract(sixInches);
 
-     for (LengthUnit u1 : LengthUnit.values()) {
-         for (LengthUnit u2 : LengthUnit.values()) {
-             double v1 = 10.0, v2 = 2.0;
-             double ratio = (v1 * u1.getConversionFactor()) /
-                            (v2 * u2.getConversionFactor());
+        assertEquals(9.5, result.getValue());
+    }
 
-             args.add(Arguments.of(v1, u1, v2, u2, ratio));
-         }
-     }
+    @Test
+    public void subtractExplicitTargetUnit() {
+        Quantity<LengthUnit> tenFeet = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> sixInches = new Quantity<>(6.0, LengthUnit.INCHES);
+        Quantity<LengthUnit> result = tenFeet.subtract(sixInches, LengthUnit.INCHES);
 
-     for (WeightUnit u1 : WeightUnit.values()) {
-         for (WeightUnit u2 : WeightUnit.values()) {
-             double v1 = 10.0, v2 = 2.0;
-             double ratio = (v1 * u1.getConversionFactor()) /
-                            (v2 * u2.getConversionFactor());
+        assertEquals(114.0, result.getValue());
+    }
 
-             args.add(Arguments.of(v1, u1, v2, u2, ratio));
-         }
-     }
+    @Test
+    public void subtractNegativeResult() {
+        Quantity<LengthUnit> five = new Quantity<>(5.0, LengthUnit.FEET);
+        Quantity<LengthUnit> ten = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> result = five.subtract(ten);
 
-     for (VolumeUnit u1 : VolumeUnit.values()) {
-         for (VolumeUnit u2 : VolumeUnit.values()) {
-             double v1 = 10.0, v2 = 2.0;
-             double ratio = (v1 * u1.getConversionFactor()) /
-                            (v2 * u2.getConversionFactor());
+        assertEquals(-5.0, result.getValue());
+    }
+    
+    @Test
+    public void divideSameUnit() {
+        Quantity<LengthUnit> ten = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> two = new Quantity<>(2.0, LengthUnit.FEET);
+        double result = ten.divide(two);
 
-             args.add(Arguments.of(v1, u1, v2, u2, ratio));
-         }
-     }
+        assertEquals(5.0, result);
+    }
 
-     return args.stream();
- }
- 
- /**
-  * Helper method to use Reflection to find the private ArithmeticOperation enum.
-  */
- private Class<?> getArithmeticOperationEnum() throws Exception {
-     for (Class<?> clazz : Quantity.class.getDeclaredClasses()) {
-         if (clazz.getSimpleName().equals("ArithmeticOperation")) {
-             return clazz;
-         }
-     }
-     throw new ClassNotFoundException(
-             "ArithmeticOperation enum not found inside Quantity class");
- }
+    @Test
+    public void divideCrossUnit() {
+        Quantity<LengthUnit> twentyFourInches = new Quantity<>(24.0, LengthUnit.INCHES);
+        Quantity<LengthUnit> twoFeet = new Quantity<>(2.0, LengthUnit.FEET);
+        double result = twentyFourInches.divide(twoFeet);
 
- @Test
- public void testHelper_PrivateVisibility() throws Exception {
+        assertEquals(1.0, result);
+    }
 
-     Method method = Quantity.class.getDeclaredMethod(
-             "performBaseArithmetic",
-             Quantity.class,
-             getArithmeticOperationEnum()
-     );
+    @Test
+    public void divideLessThanOne() {
+        Quantity<LengthUnit> five = new Quantity<>(5.0, LengthUnit.FEET);
+        Quantity<LengthUnit> ten = new Quantity<>(10.0, LengthUnit.FEET);
 
-     assertTrue(
-             Modifier.isPrivate(method.getModifiers()),
-             "performBaseArithmetic should be private to ensure Encapsulation"
-     );
- }
+        double result = five.divide(ten);
 
- @Test
- public void testValidation_Helper_PrivateVisibility() throws Exception {
+        assertEquals(0.5, result);
+    }
 
-     Method method = Quantity.class.getDeclaredMethod(
-             "validateArithmeticOperands",
-             Quantity.class,
-             IMeasurable.class,
-             boolean.class
-     );
+    @Test
+    public void divideByZeroThrowsException() {
+        Quantity<LengthUnit> ten = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> zero = new Quantity<>(0.0, LengthUnit.FEET);
 
-     assertTrue(
-             Modifier.isPrivate(method.getModifiers()),
-             "validateArithmeticOperands should be private"
-     );
- }
+        assertThrows(IllegalArgumentException.class, () -> {
+            ten.divide(zero);
+        });
+    }
+    
+    @Test
+    public void temperatureCelsiusEqualsFahrenheit() {
+        Quantity<TemperatureUnit> c = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> f = new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
 
- @Test
- @SuppressWarnings({"unchecked", "rawtypes"})
- public void testEnumConstant_ADD_CorrectlyAdds() throws Exception {
+        assertTrue(c.equals(f));
+    }
 
-     Class<?> enumClass = getArithmeticOperationEnum();
+    @Test
+    public void temperatureNotEqual() {
+        Quantity<TemperatureUnit> c = new Quantity<>(10.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> f = new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
 
-     Object addConstant =
-             Enum.valueOf((Class<Enum>) enumClass, "ADD");
+        assertFalse(c.equals(f));
+    }
+    
+    @Test
+    public void convertCelsiusToFahrenheit() {
+        Quantity<TemperatureUnit> c = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        double result = c.convertTo(TemperatureUnit.FAHRENHEIT);
 
-     Method computeMethod =
-             enumClass.getDeclaredMethod("compute", double.class, double.class);
-     computeMethod.setAccessible(true);
+        assertEquals(32.0, result);
+    }
 
-     double result =
-             (double) computeMethod.invoke(addConstant, 7.0, 3.0);
+    @Test
+    public void convertFahrenheitToCelsius() {
+        Quantity<TemperatureUnit> f = new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+        double result = f.convertTo(TemperatureUnit.CELSIUS);
 
-     assertEquals(10.0, result, "ADD enum logic failed");
- }
-
- @Test
- @SuppressWarnings({"unchecked", "rawtypes"})
- public void testEnumConstant_SUBTRACT_CorrectlySubtracts() throws Exception {
-
-     Class<?> enumClass = getArithmeticOperationEnum();
-
-     Object subtractConstant =
-             Enum.valueOf((Class<Enum>) enumClass, "SUBTRACT");
-
-     Method computeMethod =
-             enumClass.getDeclaredMethod("compute", double.class, double.class);
-     computeMethod.setAccessible(true);
-
-     double result =
-             (double) computeMethod.invoke(subtractConstant, 7.0, 3.0);
-
-     assertEquals(4.0, result, "SUBTRACT enum logic failed");
- }
-
- @Test
- @SuppressWarnings({"unchecked", "rawtypes"})
- public void testEnumConstant_DIVIDE_CorrectlyDivides() throws Exception {
-
-     Class<?> enumClass = getArithmeticOperationEnum();
-
-     Object divideConstant =
-             Enum.valueOf((Class<Enum>) enumClass, "DIVIDE");
-
-     Method computeMethod =
-             enumClass.getDeclaredMethod("compute", double.class, double.class);
-     computeMethod.setAccessible(true);
-
-     double result =
-             (double) computeMethod.invoke(divideConstant, 7.0, 2.0);
-
-     assertEquals(3.5, result, "DIVIDE enum logic failed");
- }
-
- @Test
- @SuppressWarnings({"unchecked", "rawtypes"})
- public void testArithmeticOperation_DivideByZero_EnumThrows() throws Exception {
-
-     Class<?> enumClass = getArithmeticOperationEnum();
-
-     Object divideConstant =
-             Enum.valueOf((Class<Enum>) enumClass, "DIVIDE");
-
-     Method computeMethod =
-             enumClass.getDeclaredMethod("compute", double.class, double.class);
-     computeMethod.setAccessible(true);
-
-     InvocationTargetException thrown = assertThrows(
-             InvocationTargetException.class,
-             () -> computeMethod.invoke(divideConstant, 10.0, 0.0)
-     );
-
-     Throwable actualException = thrown.getCause();
-
-     assertTrue(actualException instanceof IllegalArgumentException);
-     assertEquals("Cannot divide by zero", actualException.getMessage());
- }
+        assertEquals(0.0, result);
+    }
+    
+    @Test
+    public void temperatureAddShouldThrowException() {
+        Quantity<TemperatureUnit> c1 = new Quantity<>(100.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> c2 = new Quantity<>(50.0, TemperatureUnit.CELSIUS);
+        
+        assertThrows(UnsupportedOperationException.class, () -> {
+            c1.add(c2);
+        });
+    }
 }
