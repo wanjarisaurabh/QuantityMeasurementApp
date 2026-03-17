@@ -1,26 +1,30 @@
 package com.app.quantitymeasurementapp.repository;
 
 import java.util.List;
-import com.app.quantitymeasurementapp.model.QuantityMeasurementEntity;
 
+import com.app.quantitymeasurementapp.entity.QuantityMeasurementEntity;
+
+/**
+ * Contract for storing and retrieving measurement audit logs.
+ */
 public interface IQuantityMeasurementRepository {
     
-    /**
-     * Saves a QuantityMeasurementEntity to the repository.
-     *
-     * @param entity the QuantityMeasurementEntity to be saved
-     * @return void
-     */
+    // Core CRUD
     void save(QuantityMeasurementEntity entity);
-
-    /**
-     * Retrieves all QuantityMeasurementEntity instances from the repository.
-     * @return a list of all QuantityMeasurementEntity instances
-     */
     List<QuantityMeasurementEntity> getAllMeasurements();
-
-    // Main method for testing purposes
-    public static void main(String[] args) {
-        System.out.println("Testing IQuantityMeasurementRepository interface");
+    
+    // UC16 Search & Maintenance
+    List<QuantityMeasurementEntity> getMeasurementsByOperation(String operation);
+    List<QuantityMeasurementEntity> getMeasurementsByType(String measurementType);
+    int getTotalCount();
+    void deleteAll();
+    
+    // Resource Management
+    default String getPoolStatistics() {
+        return "Pool statistics not available for this repository type.";
+    }
+    
+    default void releaseResources() {
+        // Default empty implementation
     }
 }
