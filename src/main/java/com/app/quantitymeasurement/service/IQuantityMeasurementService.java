@@ -1,13 +1,13 @@
 package com.app.quantitymeasurementapp.service;
 
 import java.util.List;
-import com.app.quantitymeasurementapp.model.QuantityDTO;
-import com.app.quantitymeasurementapp.model.QuantityMeasurementEntity;
+import com.app.quantitymeasurementapp.entity.QuantityDTO;
+import com.app.quantitymeasurementapp.entity.QuantityMeasurementEntity;
 import com.app.quantitymeasurementapp.exception.QuantityMeasurementException;
 
 /**
  * Contract for performing quantity measurement operations.
- * Accepts input as QuantityDTO Objects and returns results as QuantityDTO Objects.
+ * Acts as the bridge between the API (Controller) and Data (Repository).
  */
 public interface IQuantityMeasurementService {
     
