@@ -1,0 +1,143 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+# ===============================
+# Logs
+# ===============================
+logs/
+*.log
+*.out
+*.err
+
+# ===============================
+# Build folders
+# ===============================
+target/        # Maven
+build/         # Gradle
+out/
+
+# ===============================
+# Maven
+# ===============================
+.mvn/
+!wrapper/maven-wrapper.jar
+
+# ===============================
+# Gradle
+# ===============================
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ===============================
+# Java class files
+# ===============================
+*.class
+
+# ===============================
+# IDE - IntelliJ IDEA
+# ===============================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# ===============================
+# IDE - Eclipse
+# ===============================
+.project
+.classpath
+.settings/
+.springBeans
+.sts4-cache/
+
+# ===============================
+# IDE - VS Code
+# ===============================
+.vscode/
+
+# ===============================
+# OS files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Environment & Secrets
+# ===============================
+.env
+application-local.properties
+application-dev.properties
+
+# ===============================
+# Temporary files
+# ===============================
+*.tmp
+*.swp
+*~
+
+# ===============================
+# Test reports
+# ===============================
+/test-output/
+/surefire-reports/
+
+# ===============================
+# Docker (optional)
+# ===============================
+docker-compose.override.yml
+
+# ===============================
+# Coverage tool
+# ===============================
+/coverage/
+/jacoco.exec
+
+# ===============================
+# Node (if frontend included)
+# ===============================
+node_modules/
+dist/
+
+# ===============================
+# Misc
+# ===============================
+*.jar
+*.war
+*.ear
+
+target/
+HELP
+.mvn/
+mvnw
+mvnw.cmd
+.gitattributes
